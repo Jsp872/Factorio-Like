@@ -19,19 +19,15 @@ public class PauseMenu : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
 
-    [Header("Gameplay References")]
-    private PlayerInput playerInput;
-
     private bool isPaused;
 
     private void Start()
     {
-        playerInput = GetComponent<PlayerInput>();
         SettingsManager.ApplySettings(fullScreen, mute, volumeSlider, audioSource);
         optionPanel.SetActive(false);
     }
 
-    public void OnPause()
+    public void Pause()
     {
         if (optionPanel.activeSelf) return;
 
