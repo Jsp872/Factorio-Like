@@ -21,12 +21,11 @@ public class PlayerInput : MonoBehaviour
 
     public void CreateBuilding(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (!context.performed) return;
+
+        if (!UIBlocker.IsOverUI)
         {
-            if (!UIBlocker.IsOverUI)
-            {
-                gridManager.CreateBuilding();
-            }
+            gridManager.CreateBuilding();
         }
     }
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Convois : MonoBehaviour
+public class Convois : Building
 {
     
 }
