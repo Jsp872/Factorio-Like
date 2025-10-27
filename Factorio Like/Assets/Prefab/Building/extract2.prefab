@@ -1184,6 +1184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4872342754739693657}
   - component: {fileID: 3843003211451653076}
+  - component: {fileID: -1676903153403862107}
   m_Layer: 0
   m_Name: extract2
   m_TagString: Untagged
@@ -1274,6 +1275,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.9133985, y: 3.5429778}
   m_EdgeRadius: 0
+--- !u!114 &-1676903153403862107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5041374892340605471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 227049632301cd94abe4d489e5ec69a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Extractor
+  Health: 0
+  isWorking: 1
+  cost: 2
+  miningTime: 3
 --- !u!1 &5131524591829296953
 GameObject:
   m_ObjectHideFlags: 0

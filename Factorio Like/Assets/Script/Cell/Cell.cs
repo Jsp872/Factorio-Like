@@ -3,10 +3,11 @@ using UnityEngine;
 [System.Serializable]
 public class Cell
 {
-    public Vector2 Position;
+    public Vector3 Position;
     public GameObject Prefab;
+    public bool haveAtome;
 
-    public void Initialize(Vector2 position, GameObject values)
+    public void Initialize(Vector3 position, GameObject values)
     {
         this.Position = position;
         this.Prefab = values;
@@ -17,9 +18,14 @@ public class Cell
         return Prefab;
     }
 
-    public Vector2 GetPosition()
+    public Vector3 GetPosition()
     {
         return Position;
+    }
+
+    public bool GetAtome()
+    {
+        return haveAtome = true;
     }
 
     public void ChangeValue(GameObject newPrefab)

@@ -3,6 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class Building : MonoBehaviour
 {
-    [SerializeField] private int Health;
-    [SerializeField] private int isWorking;
+    [SerializeField] protected int Health;
+    [SerializeField] protected bool isWorking;
+    public int cost;
 }

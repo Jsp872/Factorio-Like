@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.InputSystem;
-using UnityEngine.EventSystems;
+using UnityEngine.PlayerLoop;
 
 
 public class GridManager : MonoBehaviour
@@ -11,10 +11,16 @@ public class GridManager : MonoBehaviour
     [SerializeField] private int width;
     [SerializeField] private int cellSize;
     [SerializeField] private Vector2 originPosition;
-    [SerializeField] private List<Cell> cells;
+    public List<Cell> cells;
 
-    [SerializeField] private GameObject valueChoose;
-
+    [SerializeField] private GameObject buildingValueChoose;
+    [SerializeField] private List<GameObject> floors;
+    public static List<GameObject> Floors { get; private set; }
+    
+    private void Awake()
+    {
+        Floors = floors;
+    }
     private void Start()
     {
         Initialize();
@@ -43,6 +49,11 @@ public class GridManager : MonoBehaviour
                 cells.Add(cell);
             }
         }
+        
+        foreach (var cell in from cell in cells let randomInt = Random.Range(0, 100) where randomInt >= 80 select cell)
+        {
+            cell.GetAtome();
+        }
     }
 
     private void OnDrawGizmos()
@@ -54,13 +65,30 @@ public class GridManager : MonoBehaviour
             Vector2 position = cell.GetPosition();
             
             Gizmos.DrawWireCube(new Vector2(position.x, position.y), new Vector2(cellSize, cellSize));
+            
+            if (cell.haveAtome) Gizmos.DrawWireCube(new Vector2(position.x, position.y), new Vector2(0.1f, 0.1f));
         }
     }
 
     public void CreateBuilding()
     {
-        ChangeValueOnClick(GetMousePositionOnClick(), valueChoose);
+        if (buildingValueChoose == null) return;
+
+        Building building = buildingValueChoose.GetComponent<Building>();
+        if (building == null) return;
+
+        if (Inventory.gold < building.cost)
+        {
+            Debug.Log("Pas assez d'or !");
+            return;
+        }
+        else
+        {
+            Inventory.gold -= building.cost;
+        }
+        ChangeValueOnClick(GetMousePositionOnClick(), buildingValueChoose);
     }
+
 
 
     private void ChangeValueOnClick(Vector2 mousePosition, GameObject prefab)
@@ -75,11 +103,10 @@ public class GridManager : MonoBehaviour
             if (rect.Contains(mousePosition) && cell.Prefab == null)
             {
                 cell.ChangeValue(prefab);
-                Instantiate(prefab, position, prefab.transform.rotation);
+                GameObject instance = Instantiate(prefab, position, prefab.transform.rotation);
+                instance.transform.SetParent(transform);
                 break;
             }
-            else
-                Debug.Log("Already a building");
         }
     }
 
@@ -96,11 +123,6 @@ public class GridManager : MonoBehaviour
 
     public void ChooseValue(GameObject value)
     {
-        valueChoose = value;
-    }
-
-    private void Update()
-    {
-        
+        buildingValueChoose = value;
     }
 }
