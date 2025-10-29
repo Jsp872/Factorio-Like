@@ -13,7 +13,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        text = text2;
+        text = text2;   
         text.text = gold.ToString();
     }
 

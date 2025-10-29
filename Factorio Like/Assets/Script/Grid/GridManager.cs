@@ -9,18 +9,13 @@ public class GridManager : MonoBehaviour
 {
     [SerializeField] private int height;
     [SerializeField] private int width;
-    [SerializeField] private int cellSize;
+    public int cellSize;
     [SerializeField] private Vector2 originPosition;
     public List<Cell> cells;
 
     [SerializeField] private GameObject buildingValueChoose;
     [SerializeField] private List<GameObject> floors;
-    public static List<GameObject> Floors { get; private set; }
     
-    private void Awake()
-    {
-        Floors = floors;
-    }
     private void Start()
     {
         Initialize();
@@ -82,33 +77,70 @@ public class GridManager : MonoBehaviour
             Debug.Log("Pas assez d'or !");
             return;
         }
-        else
+        bool success = ChangeValueOnClick(GetMousePositionOnClick(), buildingValueChoose);
+
+        if (success)
         {
             Inventory.gold -= building.cost;
+            Inventory.text.text = Inventory.gold.ToString();
         }
-        ChangeValueOnClick(GetMousePositionOnClick(), buildingValueChoose);
     }
 
 
 
-    private void ChangeValueOnClick(Vector2 mousePosition, GameObject prefab)
+    private bool ChangeValueOnClick(Vector2 mousePosition, GameObject prefab)
     {
-        if (prefab == null) return;
-        
+        if (prefab == null) return false;
+
         foreach (Cell cell in cells)
         {
             Vector2 position = cell.GetPosition();
             Rect rect = new Rect(position.x - cellSize / 2f, position.y - cellSize / 2f, cellSize, cellSize);
 
+            // Vérifie que la cellule est libre
             if (rect.Contains(mousePosition) && cell.Prefab == null)
             {
-                cell.ChangeValue(prefab);
                 GameObject instance = Instantiate(prefab, position, prefab.transform.rotation);
+                cell.ChangeValue(instance);
+
                 instance.transform.SetParent(transform);
+                return true; // construction réussie
+            }
+        }
+
+        return false; // pas de construction possible
+    }
+
+
+    public void RemoveBuilding()
+    {
+        Vector2 mousePosition = GetMousePositionOnClick();
+
+        foreach (Cell cell in cells)
+        {
+            Vector2 cellPos = cell.GetPosition();
+            Rect cellRect = new Rect(cellPos.x- cellSize / 2f, cellPos.y- cellSize / 2f, cellSize, cellSize);
+            
+            if (cellRect.Contains(mousePosition))
+            {
+                if (cell.Prefab != null)
+                {
+                    Building building = cell.Prefab.GetComponent<Building>();
+                    if (building != null)
+                    {
+                        Inventory.gold += Mathf.FloorToInt(building.cost);
+                        Inventory.UpdateText();
+                    }
+                    
+                    GameObject.Destroy(cell.Prefab);
+                    cell.ChangeValue(null);
+                }
+                
                 break;
             }
         }
     }
+
 
     private Vector2 GetMousePositionOnClick()
     {

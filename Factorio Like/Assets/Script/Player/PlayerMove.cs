@@ -5,11 +5,11 @@ using UnityEngine.InputSystem;
 public class PlayerMove : MonoBehaviour
 {
     public Vector3 direction;
-    public Rigidbody2D rb2d;
+    public Rigidbody rb;
     public float moveSpeed ;
     private void Start()
     {
-        rb2d = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody>();
     }
     
     public void Move(InputAction.CallbackContext context)

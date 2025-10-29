@@ -29,8 +29,18 @@ public class PlayerInput : MonoBehaviour
         }
     }
 
+    public void RemoveBuilding(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+
+        if (!UIBlocker.IsOverUI)
+        {
+            gridManager.RemoveBuilding();
+        }
+    }
+
     private void Update()
     {
-        playerMove.rb2d.linearVelocity = playerMove.direction * playerMove.moveSpeed;
+        playerMove.rb.linearVelocity = playerMove.direction * playerMove.moveSpeed;
     }
 }
