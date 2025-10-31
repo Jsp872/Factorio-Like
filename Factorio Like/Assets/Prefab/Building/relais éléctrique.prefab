@@ -191,6 +191,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4247332313178102343}
   - component: {fileID: 8047802020338331742}
+  - component: {fileID: -7812903073144946975}
   m_Layer: 0
   m_Name: "relais \xE9l\xE9ctrique"
   m_TagString: Untagged
@@ -261,3 +262,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5912155, y: 2.234491}
   m_EdgeRadius: 0
+--- !u!114 &-7812903073144946975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8424595117124747224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f29fd71bcdd4b3469e3b795f538b211, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ElectricalRelay
+  isActive: 0

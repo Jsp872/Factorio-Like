@@ -161,5 +161,12 @@ MonoBehaviour:
   cost: 5
   grabZone: {fileID: 1210082426471556102}
   grabZonePosition: {x: -1, y: 0}
+  grabZoneSize: {x: 1, y: 1, z: 1}
   duration: 0.5
   moveDistance: 2
+  atomLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  chestLayer:
+    serializedVersion: 2
+    m_Bits: 128

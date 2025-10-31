@@ -6,6 +6,7 @@ public class Cell
     public Vector3 Position;
     public GameObject Prefab;
     public bool haveAtome;
+    public bool haveElectricity;
 
     public void Initialize(Vector3 position, GameObject values)
     {
@@ -26,6 +27,11 @@ public class Cell
     public bool GetAtome()
     {
         return haveAtome = true;
+    }
+
+    public bool GetElectricity()
+    {
+        return haveElectricity = true;
     }
 
     public void ChangeValue(GameObject newPrefab)

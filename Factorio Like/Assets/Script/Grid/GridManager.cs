@@ -7,19 +7,34 @@ using UnityEngine.PlayerLoop;
 
 public class GridManager : MonoBehaviour
 {
-    [SerializeField] private int height;
-    [SerializeField] private int width;
+    public int height;
+    public int width;
     public int cellSize;
-    [SerializeField] private Vector2 originPosition;
+    public Vector2 originPosition;
     public List<Cell> cells;
 
     [SerializeField] private GameObject buildingValueChoose;
     [SerializeField] private List<GameObject> floors;
+
+    public bool buildingMode;
     
-    private void Start()
+    [Header("Preview Settings")]
+    [SerializeField] private GameObject buildingPreviewPrefab; // prefab transparent pour l’aperçu
+    public GameObject currentPreview;
+    private Camera mainCamera;
+
+
+    private void Awake()
     {
+        mainCamera = Camera.main;
         Initialize();
     }
+    
+    private void Update()
+    {
+        UpdatePreview();
+    }
+
 
     private void Initialize()
     {
@@ -67,50 +82,29 @@ public class GridManager : MonoBehaviour
 
     public void CreateBuilding()
     {
-        if (buildingValueChoose == null) return;
+        if (buildingValueChoose == null || !buildingMode) return;
+
+        Vector2 mousePos = GetMousePositionOnClick();
+        Cell cell = GetCellAtPosition(mousePos);
+
+        if (cell == null || cell.Prefab != null) return;
 
         Building building = buildingValueChoose.GetComponent<Building>();
         if (building == null) return;
 
-        if (Inventory.gold < building.cost)
-        {
-            Debug.Log("Pas assez d'or !");
-            return;
-        }
-        bool success = ChangeValueOnClick(GetMousePositionOnClick(), buildingValueChoose);
+        if (Inventory.gold < building.cost) return;
+        
+        Inventory.gold -= Mathf.FloorToInt(building.cost);
+        Inventory.text.text = Inventory.gold.ToString();
 
-        if (success)
-        {
-            Inventory.gold -= building.cost;
-            Inventory.text.text = Inventory.gold.ToString();
-        }
+        GameObject instance = Instantiate(buildingValueChoose, cell.GetPosition(), buildingValueChoose.transform.rotation);
+        cell.ChangeValue(instance);
+        instance.transform.SetParent(transform);
+        
+        Building placedBuilding = instance.GetComponent<Building>();
+        if (placedBuilding != null)
+            placedBuilding.Place();
     }
-
-
-
-    private bool ChangeValueOnClick(Vector2 mousePosition, GameObject prefab)
-    {
-        if (prefab == null) return false;
-
-        foreach (Cell cell in cells)
-        {
-            Vector2 position = cell.GetPosition();
-            Rect rect = new Rect(position.x - cellSize / 2f, position.y - cellSize / 2f, cellSize, cellSize);
-
-            // Vérifie que la cellule est libre
-            if (rect.Contains(mousePosition) && cell.Prefab == null)
-            {
-                GameObject instance = Instantiate(prefab, position, prefab.transform.rotation);
-                cell.ChangeValue(instance);
-
-                instance.transform.SetParent(transform);
-                return true; // construction réussie
-            }
-        }
-
-        return false; // pas de construction possible
-    }
-
 
     public void RemoveBuilding()
     {
@@ -145,16 +139,62 @@ public class GridManager : MonoBehaviour
     private Vector2 GetMousePositionOnClick()
     {
         Vector3 mouseScreen = Mouse.current.position.ReadValue();
-        Camera mainCamera = Camera.main;
-        
+
         mouseScreen.z = -mainCamera.transform.position.z; 
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(mouseScreen);
         return new Vector2(worldPosition.x, worldPosition.y);
     }
-
-    public void ChooseValue(GameObject value)
+    public void SelectBuilding(GameObject prefab)
     {
-        buildingValueChoose = value;
+        buildingValueChoose = prefab;
+
+        if (currentPreview != null)
+            Destroy(currentPreview);
+
+        if (prefab != null)
+        {
+            currentPreview = Instantiate(prefab);
+            currentPreview.SetActive(true);
+            
+            SetPreviewColor(Color.green);
+            
+            foreach (Collider c in currentPreview.GetComponentsInChildren<Collider>())
+                c.enabled = false;
+        }
+    }
+
+
+    private void UpdatePreview()
+    {
+        if (currentPreview == null || !buildingMode) return;
+
+        Vector2 mousePos = GetMousePositionOnClick();
+        Cell cell = GetCellAtPosition(mousePos);
+
+        if (cell != null)
+        {
+            currentPreview.transform.position = cell.GetPosition();
+            SetPreviewColor(cell.Prefab == null ? Color.green : Color.red);
+        }
+    }
+
+
+    private void SetPreviewColor(Color color)
+    {
+        if (currentPreview == null) return;
+        foreach (Renderer r in currentPreview.GetComponentsInChildren<Renderer>())
+        {
+            r.material.color = color;
+        }
+    }
+
+    private Cell GetCellAtPosition(Vector2 mousePos)
+    {
+        int x = Mathf.FloorToInt((mousePos.x - originPosition.x + width * cellSize / 2f) / cellSize);
+        int y = Mathf.FloorToInt((mousePos.y - originPosition.y + height * cellSize / 2f) / cellSize);
+
+        if (x < 0 || x >= width || y < 0 || y >= height) return null;
+        return cells[y * width + x];
     }
 }

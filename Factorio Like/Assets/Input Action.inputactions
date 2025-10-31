@@ -145,7 +145,7 @@
                     "name": "",
                     "id": "785a10fe-4eb1-4bd5-a819-9755cd0c6d03",
                     "path": "<Mouse>/rightButton",
-                    "interactions": "",
+                    "interactions": "Hold(duration=1)",
                     "processors": "",
                     "groups": "",
                     "action": "Remove",

@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4825419416342954336}
   - component: {fileID: 717152269833329254}
-  - component: {fileID: 7918420921470059266}
   - component: {fileID: 5290476820634069762}
   m_Layer: 0
   m_Name: Crane
@@ -124,27 +123,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!65 &7918420921470059266
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3424882496851303901}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.99449134, y: 1, z: 0.2}
-  m_Center: {x: -0.9998363, y: 0, z: 0}
 --- !u!114 &5290476820634069762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,5 +139,12 @@ MonoBehaviour:
   cost: 1
   grabZone: {fileID: 1210082426471556102}
   grabZonePosition: {x: -1, y: 0}
+  grabZoneSize: {x: 1, y: 1, z: 1}
   duration: 1
   moveDistance: 2
+  atomLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  chestLayer:
+    serializedVersion: 2
+    m_Bits: 128
