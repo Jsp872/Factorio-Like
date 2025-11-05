@@ -1,24 +1,42 @@
-using System;
-using NUnit.Framework.Internal;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour
+public class InventoryUI : MonoBehaviour
 {
-    public static int gold = 10;
-    
-    public static TextMeshProUGUI text;
+    [System.Serializable]
+    public class ResourceUI
+    {
+        public string name;
+        public TextMeshProUGUI text;
+    }
 
-    public TextMeshProUGUI text2;
+    [Header("Références UI")]
+    public List<ResourceUI> resourceUIList;
+
+    private static Dictionary<string, TextMeshProUGUI> uiDict;
+
+    private void Awake()
+    {
+        uiDict = new Dictionary<string, TextMeshProUGUI>();
+        foreach (var res in resourceUIList)
+            uiDict[res.name.ToLower()] = res.text;
+    }
 
     private void Start()
     {
-        text = text2;   
-        text.text = gold.ToString();
+        foreach (var pair in uiDict)
+        {
+            int current = ResourceManager.Get(pair.Key);
+            UpdateUI(pair.Key, current);
+        }
     }
 
-    public static void UpdateText()
+    public static void UpdateUI(string name, int amount)
     {
-        text.text = gold.ToString();
+        if (uiDict != null && uiDict.TryGetValue(name.ToLower(), out var text))
+        {
+            text.text = amount.ToString();
+        }
     }
 }

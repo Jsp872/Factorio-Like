@@ -41,6 +41,7 @@ public class Convoy : UtilityBuildings
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
+            rb.linearVelocity = directionToMove * 0.1f;
         }
     }
 

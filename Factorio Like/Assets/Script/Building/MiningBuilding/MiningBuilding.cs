@@ -1,32 +1,71 @@
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 
 public class MiningBuilding : Building
 {
-    [SerializeField] protected bool isWorking;
-    [SerializeField] protected float miningTime;
-    [SerializeField] protected GameObject objectToSpawn;
+    [Header("Mining Settings")]
+    [SerializeField] private float miningTime = 2f;
+    [SerializeField] private GameObject spawnAtom;
     
-    GridManager gridManager;
+    private GridManager gridManager;
+    private Cell currentCell;
+
     private void Start()
     {
-        if (GetComponentInParent<GridManager>() == null) return;
-        
         gridManager = GetComponentInParent<GridManager>();
-        foreach (var cell in gridManager.cells.Where(cell => transform.position == cell.Position && cell.haveAtome))
+        if (gridManager == null)
         {
-            StartCoroutine(Mining(gridManager.cellSize));
+            Debug.LogWarning("MiningBuilding : aucun GridManager trouvé.");
+            return;
+        }
+
+        // Trouve la cellule sur laquelle le bâtiment est posé
+        foreach (var cell in gridManager.cells)
+        {
+            if (transform.position == cell.Position && cell.haveAtom)
+            {
+                currentCell = cell;
+                break;
+            }
+        }
+
+        if (currentCell != null)
+        {
+            StartCoroutine(Mining());
+        }
+        else
+        {
+            Debug.LogWarning("MiningBuilding : pas d’atome à miner sous ce bâtiment.");
         }
     }
 
-    private IEnumerator Mining(int cellSize)
+    private IEnumerator Mining()
     {
-        yield return new WaitForSeconds(miningTime);
-        Vector3 position = new Vector3(transform.position.x + 0.5f, transform.position.y, transform.position.z);
-        Instantiate(objectToSpawn, position, Quaternion.identity);
-        Inventory.gold += 1;
-        Inventory.UpdateText();
-        StartCoroutine(Mining(cellSize));
+        while (currentCell != null)
+        {
+            yield return new WaitForSeconds(miningTime);
+            
+            RessourceList.Ressource minedRessource = null;
+
+            foreach (var atom in currentCell.atoms)
+            {
+                if (atom.active)
+                {
+                    minedRessource = atom;
+                    break;
+                }
+            }
+
+            if (minedRessource != null)
+            {
+                if (spawnAtom != null && minedRessource.prefab != null)
+                {
+                    Instantiate(minedRessource.prefab, spawnAtom.transform.position, Quaternion.identity);
+                }
+                
+                ResourceManager.Add(minedRessource.name, 1);
+                Debug.Log($"Mine a produit : {minedRessource.name}");
+            }
+        }
     }
 }

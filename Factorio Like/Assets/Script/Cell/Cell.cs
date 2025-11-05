@@ -1,18 +1,37 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public class Cell
 {
     public Vector3 Position;
     public GameObject Prefab;
-    public bool haveAtome;
+    public bool haveAtom;
     public bool haveElectricity;
+    public bool isPurify;
+    
+    public List<RessourceList.Ressource> atoms = new List<RessourceList.Ressource>();
 
-    public void Initialize(Vector3 position, GameObject values)
+    public void Initialize(Vector3 position, GameObject values, RessourceList ressourceList)
     {
         this.Position = position;
         this.Prefab = values;
+        this.atoms = new List<RessourceList.Ressource>();
+        
+        foreach (var a in ressourceList.ressources)
+        {
+            this.atoms.Add(new RessourceList.Ressource
+            {
+                name = a.name,
+                color = a.color,
+                prefab = a.prefab,
+                active = false
+            });
+        }
     }
+
+
 
     public GameObject GetValue()
     {
@@ -24,14 +43,19 @@ public class Cell
         return Position;
     }
 
-    public bool GetAtome()
+    public bool GetAtom()
     {
-        return haveAtome = true;
+        return haveAtom = true;
     }
 
     public bool GetElectricity()
     {
         return haveElectricity = true;
+    }
+
+    public bool GetPurify()
+    {
+        return isPurify = true;
     }
 
     public void ChangeValue(GameObject newPrefab)

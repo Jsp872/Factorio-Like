@@ -1,48 +1,45 @@
-using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.PlayerLoop;
-
+using UnityEngine.Serialization;
 
 public class GridManager : MonoBehaviour
 {
+    [Header("Grid Settings")]
     public int height;
     public int width;
     public int cellSize;
     public Vector2 originPosition;
     public List<Cell> cells;
 
+    [Header("Building Settings")]
     [SerializeField] private GameObject buildingValueChoose;
-    [SerializeField] private List<GameObject> floors;
-
     public bool buildingMode;
-    
-    [Header("Preview Settings")]
-    [SerializeField] private GameObject buildingPreviewPrefab; // prefab transparent pour l’aperçu
-    public GameObject currentPreview;
-    private Camera mainCamera;
 
+    [FormerlySerializedAs("atomList")] [Header("Atoms")]
+    public RessourceList _ressourceList;
+
+    [Header("Preview Settings")]
+    [SerializeField] private GameObject buildingPreviewPrefab;
+    public GameObject currentPreview;
+
+    private Camera mainCamera;
 
     private void Awake()
     {
         mainCamera = Camera.main;
         Initialize();
     }
-    
+
     private void Update()
     {
         UpdatePreview();
     }
 
-
     private void Initialize()
     {
-        if (cells == null)
-        {
-            cells = new List<Cell>();
-        }
-        
+        if (cells == null) cells = new List<Cell>();
+
         float startX = (-width / 2f) * cellSize + originPosition.x + cellSize * 0.5f;
         float startY = (-height / 2f) * cellSize + originPosition.y + cellSize * 0.5f;
 
@@ -55,28 +52,28 @@ public class GridManager : MonoBehaviour
                 Vector2 position = new Vector2(nextX, nextY);
 
                 Cell cell = new Cell();
-                cell.Initialize(position,null);
+                cell.Initialize(position, null, _ressourceList);
                 cells.Add(cell);
             }
         }
-        
-        foreach (var cell in from cell in cells let randomInt = Random.Range(0, 100) where randomInt >= 80 select cell)
-        {
-            cell.GetAtome();
-        }
-    }
 
-    private void OnDrawGizmos()
-    {
-        if (cells == null) return;
-        Gizmos.color = Color.white;
-        foreach (Cell cell in cells)
+        foreach (var cell in cells)
         {
-            Vector2 position = cell.GetPosition();
-            
-            Gizmos.DrawWireCube(new Vector2(position.x, position.y), new Vector2(cellSize, cellSize));
-            
-            if (cell.haveAtome) Gizmos.DrawWireCube(new Vector2(position.x, position.y), new Vector2(0.1f, 0.1f));
+            float rand = Random.Range(0f, 1f);
+            if (rand < 0.1f)
+            {
+                cell.atoms[0].active = true;
+                cell.haveAtom = true;
+            }
+            else if (rand < 0.2f)
+            {
+                cell.atoms[1].active = true;
+                cell.haveAtom = true;
+            }
+            else
+            {
+                cell.haveAtom = false;
+            }
         }
     }
 
@@ -86,24 +83,23 @@ public class GridManager : MonoBehaviour
 
         Vector2 mousePos = GetMousePositionOnClick();
         Cell cell = GetCellAtPosition(mousePos);
-
         if (cell == null || cell.Prefab != null) return;
 
         Building building = buildingValueChoose.GetComponent<Building>();
         if (building == null) return;
 
-        if (Inventory.gold < building.cost) return;
-        
-        Inventory.gold -= Mathf.FloorToInt(building.cost);
-        Inventory.text.text = Inventory.gold.ToString();
+        if (!building.CanAfford()) return;
+        if (!building.ConsumeResources()) return;
 
-        GameObject instance = Instantiate(buildingValueChoose, cell.GetPosition(), buildingValueChoose.transform.rotation);
+        // Utilise la rotation actuelle du preview
+        Quaternion rotationToUse = currentPreview != null ? currentPreview.transform.rotation : buildingValueChoose.transform.rotation;
+
+        GameObject instance = Instantiate(buildingValueChoose, cell.GetPosition(), rotationToUse);
         cell.ChangeValue(instance);
         instance.transform.SetParent(transform);
-        
+
         Building placedBuilding = instance.GetComponent<Building>();
-        if (placedBuilding != null)
-            placedBuilding.Place();
+        if (placedBuilding != null) placedBuilding.Place();
     }
 
     public void RemoveBuilding()
@@ -113,8 +109,13 @@ public class GridManager : MonoBehaviour
         foreach (Cell cell in cells)
         {
             Vector2 cellPos = cell.GetPosition();
-            Rect cellRect = new Rect(cellPos.x- cellSize / 2f, cellPos.y- cellSize / 2f, cellSize, cellSize);
-            
+            Rect cellRect = new Rect(
+                cellPos.x - cellSize / 2f,
+                cellPos.y - cellSize / 2f,
+                cellSize,
+                cellSize
+            );
+
             if (cellRect.Contains(mousePosition))
             {
                 if (cell.Prefab != null)
@@ -122,48 +123,51 @@ public class GridManager : MonoBehaviour
                     Building building = cell.Prefab.GetComponent<Building>();
                     if (building != null)
                     {
-                        Inventory.gold += Mathf.FloorToInt(building.cost);
-                        Inventory.UpdateText();
+                        building.RefundResources();
+                        building.DestroyTheBuilding();
                     }
-                    
-                    GameObject.Destroy(cell.Prefab);
                     cell.ChangeValue(null);
                 }
-                
                 break;
             }
         }
     }
 
+    public void RotateBuilding()
+    {
+        if (currentPreview == null) return;
+
+        Building previewBuilding = currentPreview.GetComponent<Building>();
+        if (previewBuilding != null)
+        {
+            previewBuilding.RotateToNext();
+        }
+    }
 
     private Vector2 GetMousePositionOnClick()
     {
         Vector3 mouseScreen = Mouse.current.position.ReadValue();
-
-        mouseScreen.z = -mainCamera.transform.position.z; 
-
+        mouseScreen.z = -mainCamera.transform.position.z;
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(mouseScreen);
         return new Vector2(worldPosition.x, worldPosition.y);
     }
+
     public void SelectBuilding(GameObject prefab)
     {
         buildingValueChoose = prefab;
 
-        if (currentPreview != null)
-            Destroy(currentPreview);
+        if (currentPreview != null) Destroy(currentPreview);
 
         if (prefab != null)
         {
             currentPreview = Instantiate(prefab);
             currentPreview.SetActive(true);
-            
             SetPreviewColor(Color.green);
-            
+
             foreach (Collider c in currentPreview.GetComponentsInChildren<Collider>())
                 c.enabled = false;
         }
     }
-
 
     private void UpdatePreview()
     {
@@ -179,13 +183,14 @@ public class GridManager : MonoBehaviour
         }
     }
 
-
     private void SetPreviewColor(Color color)
     {
         if (currentPreview == null) return;
+
         foreach (Renderer r in currentPreview.GetComponentsInChildren<Renderer>())
         {
-            r.material.color = color;
+            if (r.material != null)
+                r.material.color = color;
         }
     }
 
@@ -195,6 +200,7 @@ public class GridManager : MonoBehaviour
         int y = Mathf.FloorToInt((mousePos.y - originPosition.y + height * cellSize / 2f) / cellSize);
 
         if (x < 0 || x >= width || y < 0 || y >= height) return null;
+
         return cells[y * width + x];
     }
 }

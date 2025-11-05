@@ -193,7 +193,7 @@ GameObject:
   - component: {fileID: -4033045540083666389}
   - component: {fileID: 3461245745498368580}
   m_Layer: 7
-  m_Name: Chest
+  m_Name: CraftingTable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -208,7 +208,7 @@ Transform:
   m_GameObject: {fileID: 3424882496851303901}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.51, y: 1.49, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -307,16 +307,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Chest
   Health: 1
-  cost:
-  - resourceName: fe
-    amount: 2
-  - resourceName: h
-    amount: 1
+  rotation: []
+  cost: []
   atomLayer:
     serializedVersion: 2
     m_Bits: 64
   grabZoneSize: {x: 0.5, y: 0.5, z: 0.5}
-  atomData: {fileID: 11400000, guid: 6ccca45bfbecf03459cc5d8800661ca0, type: 2}
+  _ressourceData: {fileID: 11400000, guid: 6ccca45bfbecf03459cc5d8800661ca0, type: 2}
 --- !u!114 &3461245745498368580
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -22,7 +22,6 @@ public class PlayerInput : MonoBehaviour
     public void CreateBuilding(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
-
         if (!UIBlocker.IsOverUI)
         {
             gridManager.CreateBuilding();
@@ -32,10 +31,18 @@ public class PlayerInput : MonoBehaviour
     public void RemoveBuilding(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
-
         if (!UIBlocker.IsOverUI)
         {
             gridManager.RemoveBuilding();
+        }
+    }
+
+    public void RotateBuilding(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+        if (!UIBlocker.IsOverUI)
+        {
+            gridManager.RotateBuilding();
         }
     }
 

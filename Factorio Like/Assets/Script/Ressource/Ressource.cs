@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Atom : MonoBehaviour
+public class Ressource : MonoBehaviour
 {
     public bool isGrabbed = false;
 }

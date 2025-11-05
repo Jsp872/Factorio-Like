@@ -202,7 +202,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Convoy
   Health: 5
-  cost: 1
+  rotation:
+  - {x: -75, y: 0, z: 0}
+  - {x: 0, y: 90, z: -90}
+  - {x: 90, y: 180, z: 0}
+  - {x: 0, y: -90, z: 90}
+  cost: []
   directionToMove: {x: 0, y: 0}
   moveSpeed: 1
 --- !u!65 &3010259148124217482

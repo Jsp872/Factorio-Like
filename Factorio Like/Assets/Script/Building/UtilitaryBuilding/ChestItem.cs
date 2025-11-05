@@ -1,10 +1,10 @@
 using UnityEngine;
 
-[System.Serializable] // permet de voir les données dans l'inspector
+[System.Serializable]
 public class ChestItem
 {
-    public GameObject item; // l'objet stocké
-    public int quantity;    // la quantité
+    public GameObject item;
+    public int quantity;
 
     public ChestItem(GameObject item, int quantity)
     {
