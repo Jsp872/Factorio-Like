@@ -28,14 +28,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3825723442567077847}
   serializedVersion: 2
-  m_LocalRotation: {x: -1, y: 0, z: 0, w: 0}
+  m_LocalRotation: {x: -0.9961947, y: 0, z: 0, w: -0.08715578}
   m_LocalPosition: {x: -0.40733808, y: 0.1743549, z: 0}
   m_LocalScale: {x: 22, y: 22, z: 22}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3796480445801601094}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -180, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -190, y: 0, z: 0}
 --- !u!33 &956453784898306366
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -124,13 +124,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Extractor
   Health: 10
   rotation:
-  - {x: -180, y: 0, z: 0}
-  - {x: -180, y: 0, z: 90}
-  - {x: -180, y: 0, z: 180}
-  - {x: -180, y: 0, z: 270}
+  - {x: -190, y: 0, z: 0}
+  - {x: -190, y: 0, z: 90}
+  - {x: -190, y: 0, z: 180}
+  - {x: -190, y: 0, z: 270}
+  cantBeDestroyed: 0
   cost:
   - resourceName: fe
-    amount: 3
+    amount: 4
+  sizeX: 1
+  sizeY: 1
   miningTime: 3
   spawnAtom: {fileID: 9174543557392330849}
 --- !u!65 &3820691112618209135
@@ -152,8 +155,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.04090774, y: 0.041155852, z: 0.073405325}
-  m_Center: {x: 0.00023710821, y: -0.000049907707, z: 0.022966621}
+  m_Size: {x: 0.04090774, y: 0.041155856, z: 0.15095036}
+  m_Center: {x: 0.00023710864, y: -0.000049908052, z: 0.010144516}
 --- !u!1 &9174543557392330849
 GameObject:
   m_ObjectHideFlags: 0

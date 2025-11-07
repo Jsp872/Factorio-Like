@@ -12,9 +12,16 @@ public class Building : MonoBehaviour
 {
     [SerializeField] protected int Health;
     [SerializeField] protected List<Vector3> rotation = new List<Vector3>();
+    public bool cantBeDestroyed = false;
+    public GameObject panelOfTheBuilding;
 
     [Header("Cost Settings")]
     [SerializeField] public List<ResourceCost> cost = new List<ResourceCost>();
+    
+    [Header("Building Size")]
+    public int sizeX = 1;
+    public int sizeY = 1;
+
 
     private int currentRotationIndex = 0;
     public bool isPlaced { get; private set; } = false;
@@ -58,7 +65,7 @@ public class Building : MonoBehaviour
 
         foreach (var res in cost)
             ResourceManager.TryConsume(res.resourceName, res.amount);
-
+        
         return true;
     }
 

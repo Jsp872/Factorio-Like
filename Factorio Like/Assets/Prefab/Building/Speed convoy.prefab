@@ -165,7 +165,7 @@ GameObject:
   - component: {fileID: 4202525919470975947}
   - component: {fileID: 3010259148124217482}
   m_Layer: 0
-  m_Name: ConvoyRight
+  m_Name: Speed convoy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -207,9 +207,14 @@ MonoBehaviour:
   - {x: 0, y: 90, z: -90}
   - {x: 90, y: 180, z: 0}
   - {x: 0, y: -90, z: 90}
-  cost: []
+  cantBeDestroyed: 0
+  cost:
+  - resourceName: fepur
+    amount: 1
+  sizeX: 1
+  sizeY: 1
   directionToMove: {x: 0, y: 0}
-  moveSpeed: 1
+  moveSpeed: 2
 --- !u!65 &3010259148124217482
 BoxCollider:
   m_ObjectHideFlags: 0

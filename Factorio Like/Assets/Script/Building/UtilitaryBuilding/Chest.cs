@@ -16,7 +16,7 @@ public class Chest : UtilityBuildings
     private Dictionary<string, GameObject> itemPrefabs = new Dictionary<string, GameObject>();
     private Dictionary<string, Color> itemColors = new Dictionary<string, Color>();
 
-    private void Awake()
+    public virtual void Awake()
     {
         itemPrefabs.Clear();
         itemColors.Clear();
@@ -89,7 +89,7 @@ public class Chest : UtilityBuildings
         }
     }
     
-    public void AddItem(string itemName, int quantity)
+    public virtual void AddItem(string itemName, int quantity)
     {
         if (items.ContainsKey(itemName))
             items[itemName] += quantity;
@@ -97,27 +97,28 @@ public class Chest : UtilityBuildings
             items[itemName] = quantity;
     }
 
-    public GameObject GetAnyItem()
+    public virtual GameObject GetAnyItem()
     {
         foreach (var itemName in new List<string>(items.Keys))
         {
             if (items[itemName] > 0)
             {
-                items[itemName]--;
-                if (items[itemName] <= 0)
-                    items.Remove(itemName);
-                
-                if (itemPrefabs.TryGetValue(itemName, out GameObject prefab))
+                // 🔹 Utilise RemoveItem() plutôt que décrémenter directement
+                if (RemoveItem(itemName, 1))
                 {
-                    return Instantiate(prefab, transform.position, Quaternion.identity);
+                    if (itemPrefabs.TryGetValue(itemName, out GameObject prefab))
+                    {
+                        return Instantiate(prefab, transform.position, Quaternion.identity);
+                    }
                 }
             }
         }
 
         return null;
     }
+
     
-    public bool RemoveItem(string itemName, int quantity)
+    public virtual bool RemoveItem(string itemName, int quantity)
     {
         if (items.ContainsKey(itemName) && items[itemName] >= quantity)
         {

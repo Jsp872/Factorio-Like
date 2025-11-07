@@ -13,6 +13,8 @@ public class Crane : UtilityBuildings
     [SerializeField] private LayerMask atomLayer;
     [SerializeField] private LayerMask chestLayer;
 
+    [HideInInspector] public RessourceType? selectedResourceType = null;
+
     private bool isGrabbing = false;
     private readonly List<GameObject> grabbedObjects = new();
     private readonly Collider[] hitsBuffer = new Collider[10];
@@ -62,7 +64,6 @@ public class Crane : UtilityBuildings
         {
             if (chestCol.TryGetComponent(out Chest chest))
             {
-                
                 GameObject item = chest.GetAnyItem();
 
                 if (item != null)
@@ -99,11 +100,13 @@ public class Crane : UtilityBuildings
     private void GrabAtom(GameObject atom)
     {
         Ressource ressourceComponent = atom.GetComponent<Ressource>();
-        if (ressourceComponent != null && ressourceComponent.isGrabbed) return;
+        if (ressourceComponent == null || ressourceComponent.isGrabbed) return;
 
-        if (ressourceComponent != null)
-            ressourceComponent.isGrabbed = true;
+        // 💡 Vérifie si c’est bien le bon type d’atome
+        if (selectedResourceType != null && ressourceComponent.type != selectedResourceType)
+            return; // pas le bon type, on ignore
 
+        ressourceComponent.isGrabbed = true;
         isGrabbing = true;
 
         atom.transform.SetParent(grabZone.transform);

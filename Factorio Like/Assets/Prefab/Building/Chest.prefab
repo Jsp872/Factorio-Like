@@ -307,16 +307,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Chest
   Health: 1
+  rotation: []
+  cantBeDestroyed: 0
   cost:
   - resourceName: fe
-    amount: 2
+    amount: 5
   - resourceName: h
-    amount: 1
+    amount: 5
+  sizeX: 1
+  sizeY: 1
   atomLayer:
     serializedVersion: 2
     m_Bits: 64
   grabZoneSize: {x: 0.5, y: 0.5, z: 0.5}
-  atomData: {fileID: 11400000, guid: 6ccca45bfbecf03459cc5d8800661ca0, type: 2}
+  _ressourceData: {fileID: 11400000, guid: 6ccca45bfbecf03459cc5d8800661ca0, type: 2}
 --- !u!114 &3461245745498368580
 MonoBehaviour:
   m_ObjectHideFlags: 0

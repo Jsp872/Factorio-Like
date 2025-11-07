@@ -63,7 +63,6 @@ public class MiningBuilding : Building
                     Instantiate(minedRessource.prefab, spawnAtom.transform.position, Quaternion.identity);
                 }
                 
-                ResourceManager.Add(minedRessource.name, 1);
                 Debug.Log($"Mine a produit : {minedRessource.name}");
             }
         }

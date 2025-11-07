@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ResourceManager : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class ResourceManager : MonoBehaviour
     [System.Serializable]
     public class ResourceData
     {
-        public string name;
+        public string ressourceName;
         public int amount;
     }
 
@@ -28,7 +29,7 @@ public class ResourceManager : MonoBehaviour
 
         resourceDict = new Dictionary<string, ResourceData>();
         foreach (var res in resources)
-            resourceDict[res.name.ToLower()] = res;
+            resourceDict[res.ressourceName.ToLower()] = res;
     }
 
     public static void Add(string name, int amount)
@@ -36,7 +37,6 @@ public class ResourceManager : MonoBehaviour
         if (Instance.resourceDict.TryGetValue(name.ToLower(), out var res))
         {
             res.amount += amount;
-            InventoryUI.UpdateUI(name, res.amount);
         }
         else
         {
@@ -51,7 +51,6 @@ public class ResourceManager : MonoBehaviour
             if (res.amount >= amount)
             {
                 res.amount -= amount;
-                InventoryUI.UpdateUI(name, res.amount);
                 return true;
             }
         }
@@ -62,4 +61,17 @@ public class ResourceManager : MonoBehaviour
     {
         return Instance.resourceDict.TryGetValue(name.ToLower(), out var res) ? res.amount : 0;
     }
+    
+    public static Dictionary<string, int> GetAllResources()
+    {
+        Dictionary<string, int> result = new Dictionary<string, int>();
+
+        foreach (var kvp in Instance.resourceDict)
+        {
+            result[kvp.Key] = kvp.Value.amount;
+        }
+
+        return result;
+    }
+
 }

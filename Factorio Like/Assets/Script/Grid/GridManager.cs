@@ -23,6 +23,10 @@ public class GridManager : MonoBehaviour
     [SerializeField] private GameObject buildingPreviewPrefab;
     public GameObject currentPreview;
 
+    [Header("Initial Building")]
+    [SerializeField] private Building initialBuilding;
+
+    
     private Camera mainCamera;
 
     private void Awake()
@@ -30,6 +34,29 @@ public class GridManager : MonoBehaviour
         mainCamera = Camera.main;
         Initialize();
     }
+    
+    private void Start()
+    {
+        if (initialBuilding != null)
+            RegisterBuilding(initialBuilding);
+    }
+
+    private void RegisterBuilding(Building building)
+    {
+        Vector3 position = building.transform.position;
+        Cell cell = GetCellAtPosition(position);
+
+        if (cell == null) return;
+
+        List<Cell> occupiedCells = GetCellsForBuilding(cell, building.sizeX, building.sizeY);
+        if (occupiedCells == null) return;
+
+        foreach (var c in occupiedCells)
+            c.ChangeValue(building.gameObject);
+
+        building.Place();
+    }
+
 
     private void Update()
     {
@@ -82,56 +109,104 @@ public class GridManager : MonoBehaviour
         if (buildingValueChoose == null || !buildingMode) return;
 
         Vector2 mousePos = GetMousePositionOnClick();
-        Cell cell = GetCellAtPosition(mousePos);
-        if (cell == null || cell.Prefab != null) return;
+        Cell originCell = GetCellAtPosition(mousePos);
+        if (originCell == null) return;
 
         Building building = buildingValueChoose.GetComponent<Building>();
         if (building == null) return;
 
+        // Liste de toutes les cellules que le bâtiment va occuper
+        List<Cell> targetCells = GetCellsForBuilding(originCell, building.sizeX, building.sizeY);
+        if (targetCells == null || targetCells.Count == 0) return;
+
+        // Vérifie si une cellule est déjà occupée
+        foreach (var cell in targetCells)
+            if (cell.Prefab != null)
+                return; // Impossible de placer ici
+
+        // Vérifie le coût
         if (!building.CanAfford()) return;
         if (!building.ConsumeResources()) return;
+        
+        InventoryUI.RefreshAll();
 
-        // Utilise la rotation actuelle du preview
-        Quaternion rotationToUse = currentPreview != null ? currentPreview.transform.rotation : buildingValueChoose.transform.rotation;
+        // Position = centre de toutes les cellules
+        Vector2 averagePos = Vector2.zero;
+        foreach (var c in targetCells)
+            averagePos += (Vector2)c.GetPosition();
 
-        GameObject instance = Instantiate(buildingValueChoose, cell.GetPosition(), rotationToUse);
-        cell.ChangeValue(instance);
+        averagePos /= targetCells.Count;
+
+        Quaternion rotationToUse = currentPreview != null
+            ? currentPreview.transform.rotation
+            : buildingValueChoose.transform.rotation;
+
+        GameObject instance = Instantiate(buildingValueChoose, averagePos, rotationToUse);
         instance.transform.SetParent(transform);
 
+        // Marque toutes les cellules comme occupées
+        foreach (var cell in targetCells)
+            cell.ChangeValue(instance);
+
         Building placedBuilding = instance.GetComponent<Building>();
-        if (placedBuilding != null) placedBuilding.Place();
+        if (placedBuilding != null)
+            placedBuilding.Place();
     }
+
+    private List<Cell> GetCellsForBuilding(Cell originCell, int sizeX, int sizeY)
+    {
+        List<Cell> result = new List<Cell>();
+
+        int originIndex = cells.IndexOf(originCell);
+        if (originIndex < 0) return null;
+
+        // Récupère les coordonnées de base
+        int originY = originIndex / width;
+        int originX = originIndex % width;
+
+        for (int y = 0; y < sizeY; y++)
+        {
+            for (int x = 0; x < sizeX; x++)
+            {
+                int targetX = originX + x;
+                int targetY = originY + y;
+
+                if (targetX >= width || targetY >= height)
+                    return null; // Dépasse la grille
+
+                result.Add(cells[targetY * width + targetX]);
+            }
+        }
+
+        return result;
+    }
+
 
     public void RemoveBuilding()
     {
         Vector2 mousePosition = GetMousePositionOnClick();
+        Cell clickedCell = GetCellAtPosition(mousePosition);
+        if (clickedCell == null || clickedCell.Prefab == null) return;
+
+        GameObject buildingObject = clickedCell.Prefab;
+        Building building = buildingObject.GetComponent<Building>();
+        
+        if (building == null || building.cantBeDestroyed) return;
+        
+        if (building != null)
+        {
+            building.RefundResources();
+            InventoryUI.RefreshAll();
+            building.DestroyTheBuilding();
+        }
 
         foreach (Cell cell in cells)
         {
-            Vector2 cellPos = cell.GetPosition();
-            Rect cellRect = new Rect(
-                cellPos.x - cellSize / 2f,
-                cellPos.y - cellSize / 2f,
-                cellSize,
-                cellSize
-            );
-
-            if (cellRect.Contains(mousePosition))
-            {
-                if (cell.Prefab != null)
-                {
-                    Building building = cell.Prefab.GetComponent<Building>();
-                    if (building != null)
-                    {
-                        building.RefundResources();
-                        building.DestroyTheBuilding();
-                    }
-                    cell.ChangeValue(null);
-                }
-                break;
-            }
+            if (cell.Prefab == buildingObject)
+                cell.ChangeValue(null);
         }
     }
+
 
     public void RotateBuilding()
     {
@@ -175,13 +250,31 @@ public class GridManager : MonoBehaviour
 
         Vector2 mousePos = GetMousePositionOnClick();
         Cell cell = GetCellAtPosition(mousePos);
+        if (cell == null) return;
 
-        if (cell != null)
+        Building building = buildingValueChoose.GetComponent<Building>();
+        if (building == null) return;
+
+        List<Cell> targetCells = GetCellsForBuilding(cell, building.sizeX, building.sizeY);
+
+        if (targetCells == null)
         {
-            currentPreview.transform.position = cell.GetPosition();
-            SetPreviewColor(cell.Prefab == null ? Color.green : Color.red);
+            SetPreviewColor(Color.red);
+            return;
         }
+
+        Vector2 averagePos = Vector2.zero;
+        foreach (var c in targetCells)
+            averagePos += (Vector2)c.GetPosition();
+
+        averagePos /= targetCells.Count;
+
+        currentPreview.transform.position = averagePos;
+
+        bool occupied = targetCells.Exists(c => c.Prefab != null);
+        SetPreviewColor(occupied ? Color.red : Color.green);
     }
+
 
     private void SetPreviewColor(Color color)
     {

@@ -39,4 +39,13 @@ public class InventoryUI : MonoBehaviour
             text.text = amount.ToString();
         }
     }
+    
+    public static void RefreshAll()
+    {
+        foreach (var res in ResourceManager.GetAllResources())
+        {
+            UpdateUI(res.Key, res.Value);
+        }
+    }
+
 }
