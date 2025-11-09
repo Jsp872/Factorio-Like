@@ -7,12 +7,11 @@ public class MiningBuilding : Building
     [SerializeField] private float miningTime = 2f;
     [SerializeField] private GameObject spawnAtom;
     
-    private GridManager gridManager;
     private Cell currentCell;
 
-    private void Start()
+    public override void Start()
     {
-        gridManager = GetComponentInParent<GridManager>();
+        base.Start();
         if (gridManager == null)
         {
             Debug.LogWarning("MiningBuilding : aucun GridManager trouvé.");
@@ -56,7 +55,7 @@ public class MiningBuilding : Building
                 }
             }
 
-            if (minedRessource != null)
+            if (minedRessource != null && hasPower)
             {
                 if (spawnAtom != null && minedRessource.prefab != null)
                 {

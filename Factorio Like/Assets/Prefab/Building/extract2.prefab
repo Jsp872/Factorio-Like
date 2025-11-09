@@ -129,11 +129,14 @@ MonoBehaviour:
   - {x: -190, y: 0, z: 180}
   - {x: -190, y: 0, z: 270}
   cantBeDestroyed: 0
+  panelOfTheBuilding: {fileID: 0}
   cost:
   - resourceName: fe
     amount: 4
   sizeX: 1
   sizeY: 1
+  needElectricity: 1
+  electricityCost: 30
   miningTime: 3
   spawnAtom: {fileID: 9174543557392330849}
 --- !u!65 &3820691112618209135

@@ -19,8 +19,9 @@ public class Crane : UtilityBuildings
     private readonly List<GameObject> grabbedObjects = new();
     private readonly Collider[] hitsBuffer = new Collider[10];
 
-    private void Start()
+    public override void Start()
     {
+        base.Start();
         grabZone.transform.localPosition = grabZonePosition;
     }
 

@@ -9,6 +9,7 @@ public class Cell
     public GameObject Prefab;
     public bool haveAtom;
     public bool haveElectricity;
+    public int electricitySources = 0;
     public bool isPurify;
     
     public List<RessourceList.Ressource> atoms = new List<RessourceList.Ressource>();

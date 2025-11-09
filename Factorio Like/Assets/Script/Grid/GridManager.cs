@@ -287,7 +287,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private Cell GetCellAtPosition(Vector2 mousePos)
+    public Cell GetCellAtPosition(Vector2 mousePos)
     {
         int x = Mathf.FloorToInt((mousePos.x - originPosition.x + width * cellSize / 2f) / cellSize);
         int y = Mathf.FloorToInt((mousePos.y - originPosition.y + height * cellSize / 2f) / cellSize);

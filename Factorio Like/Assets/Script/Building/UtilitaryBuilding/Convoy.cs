@@ -6,8 +6,9 @@ public class Convoy : UtilityBuildings
     [SerializeField] private Vector2 directionToMove;
     [SerializeField] private float moveSpeed;
 
-    private void Start()
+    public override void Start()
     {
+        base.Start();
         CheckDirection();
     }
 
