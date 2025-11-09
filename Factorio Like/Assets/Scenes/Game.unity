@@ -5464,6 +5464,8 @@ MonoBehaviour:
   gridManager: {fileID: 2060437568}
   lineMaterial: {fileID: 2100000, guid: 29cf07cf5014e80459278da4b6cc4836, type: 2}
   squareSize: 0.1
+  player: {fileID: 7835215105969915361}
+  viewRadius: 2
 --- !u!4 &1580173155
 Transform:
   m_ObjectHideFlags: 0
