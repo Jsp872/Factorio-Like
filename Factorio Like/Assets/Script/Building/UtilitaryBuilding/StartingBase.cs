@@ -32,6 +32,7 @@ public class StartingBase : Chest
             if (distance <= radiusOfPurifying * gridManager.cellSize)
             {
                 cell.isPurify = true; // purifie la cellule
+                cell.purifySources++;
             }
         }
     }

@@ -11,6 +11,7 @@ public class Cell
     public bool haveElectricity;
     public int electricitySources = 0;
     public bool isPurify;
+    public int purifySources = 0;
     
     public List<RessourceList.Ressource> atoms = new List<RessourceList.Ressource>();
 

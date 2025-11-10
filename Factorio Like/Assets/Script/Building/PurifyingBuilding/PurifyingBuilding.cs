@@ -28,6 +28,7 @@ public class PurifyingBuilding : Building
             if (distance <= radiusOfPurifying * gridManager.cellSize)
             {
                 cell.isPurify = true; // purifie la cellule
+                cell.purifySources++;
             }
         }
     }
@@ -45,7 +46,12 @@ public class PurifyingBuilding : Building
 
             if (distance <= radiusOfPurifying * gridManager.cellSize)
             {
-                cell.isPurify = false; // purifie la cellule
+                cell.purifySources--;
+                if (cell.purifySources <= 0)
+                {
+                    cell.purifySources = 0;
+                    cell.isPurify = false;
+                }
             }
         }
     }
