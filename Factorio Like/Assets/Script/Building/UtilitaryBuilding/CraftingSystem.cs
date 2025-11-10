@@ -61,6 +61,7 @@ public class CraftingSystem : MonoBehaviour
         for (int i = 0; i < recipe.resultQuantity; i++)
         {
             chest.AddItem(recipe.result, 1);
+            VictoryManager.Instance.AddIronPlate();
         }
 
         Debug.Log($"Craft réussi : {recipe.result} x{recipe.resultQuantity}");

@@ -27,7 +27,11 @@ public class PurifyingBuilding : Building
 
             if (distance <= radiusOfPurifying * gridManager.cellSize)
             {
-                cell.isPurify = true; // purifie la cellule
+                if (cell.purifySources <= 0)
+                {
+                    cell.isPurify = true; // purifie la cellule
+                    VictoryManager.Instance.AddPurifyCell();
+                }
                 cell.purifySources++;
             }
         }
@@ -51,6 +55,7 @@ public class PurifyingBuilding : Building
                 {
                     cell.purifySources = 0;
                     cell.isPurify = false;
+                    VictoryManager.Instance.RemovePurifyCell();
                 }
             }
         }

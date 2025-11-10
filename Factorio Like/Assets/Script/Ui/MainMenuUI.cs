@@ -7,6 +7,7 @@ public class MainMenuUI : MonoBehaviour
 {
     [Header("UI Panels")]
     [SerializeField] private GameObject mainMenu;
+    [SerializeField] private GameObject objectiveSelectorGameObject;
     [SerializeField] private GameObject optionPanel;
     [SerializeField] private GameObject videoPanel;
     [SerializeField] private GameObject audioPanel;
@@ -21,11 +22,13 @@ public class MainMenuUI : MonoBehaviour
     {
         SettingsManager.ApplySettings(fullScreen, mute, volumeSlider, audioSource);
         optionPanel.SetActive(false);
+        PlayerPrefs.SetInt("Objective", 0);
     }
     
-    public void PlayGame(string levelName)
+    public void PlayGame()
     {
-        SceneManager.LoadScene(levelName);
+        mainMenu.SetActive(false);
+        objectiveSelectorGameObject.SetActive(true);
     }
 
     public void OpenOptions()
@@ -70,5 +73,23 @@ public class MainMenuUI : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void BackToMainMenu()
+    {
+        mainMenu.SetActive(true);
+        objectiveSelectorGameObject.SetActive(false);
+    }
+
+    public void ChoosePurifyObjective()
+    {
+        PlayerPrefs.SetInt("Objective", 1);
+        SceneManager.LoadScene("Game");
+    }
+
+    public void ChooseCraftObjective()
+    {
+        PlayerPrefs.SetInt("Objective", 2);
+        SceneManager.LoadScene("Game");
     }
 }

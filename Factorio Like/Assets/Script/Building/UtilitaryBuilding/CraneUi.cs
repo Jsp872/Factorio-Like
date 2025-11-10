@@ -15,10 +15,12 @@ public class CraneUi : MonoBehaviour
     
     public void ChangeAtomToSelected(GameObject atom)
     {
+        Debug.Log("a");
         if (!crane.isPlaced) return;
-
+        Debug.Log("b");
         if (atom.TryGetComponent(out Ressource res))
         {
+            Debug.Log("c");
             crane.selectedResourceType = res.type;
         }
         else crane.selectedResourceType = null;
