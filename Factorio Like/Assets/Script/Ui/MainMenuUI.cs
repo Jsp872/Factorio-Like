@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -24,7 +23,7 @@ public class MainMenuUI : MonoBehaviour
         optionPanel.SetActive(false);
         PlayerPrefs.SetInt("Objective", 0);
     }
-    
+
     public void PlayGame()
     {
         mainMenu.SetActive(false);
@@ -55,25 +54,11 @@ public class MainMenuUI : MonoBehaviour
         videoPanel.SetActive(false);
     }
 
-    public void SetFullScreen(bool value)
-    {
-        SettingsManager.SetFullScreen(value);
-    }
+    public void SetFullScreen(bool value) => SettingsManager.SetFullScreen(value);
+    public void SetMute(bool value) => SettingsManager.SetMute(audioSource, value);
+    public void SetVolume(float value) => SettingsManager.SetVolume(audioSource, value);
 
-    public void SetMute(bool value)
-    {
-        SettingsManager.SetMute(audioSource, value);
-    }
-
-    public void SetVolume(float value)
-    {
-        SettingsManager.SetVolume(audioSource, value);
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
-    }
+    public void QuitGame() => Application.Quit();
 
     public void BackToMainMenu()
     {

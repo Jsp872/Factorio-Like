@@ -9,14 +9,10 @@ public class VictoryManager : MonoBehaviour
     [SerializeField] private GameObject victoryPanel;
 
     private int objective;
-
     public int numberOfCellPurify;
     public int numberOfIronPlateCreate;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+    private void Awake() => Instance = this;
 
     private void Start()
     {
@@ -50,6 +46,6 @@ public class VictoryManager : MonoBehaviour
         if (objective == 1)
             text.text = $"Zone à purifier : {numberOfCellPurify} / 2500";
         else if (objective == 2)
-            text.text = $"Plaque de fer a creer : {numberOfIronPlateCreate.ToString()} / 100";
+            text.text = $"Plaque de fer a creer : {numberOfIronPlateCreate} / 100";
     }
 }

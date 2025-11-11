@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 
-[System.Serializable]
+[Serializable]
 public class Recipe
 {
     public List<(string itemName, int quantity)> ingredients;

@@ -16,21 +16,22 @@ public class Building : MonoBehaviour
     public bool cantBeDestroyed = false;
     public GameObject panelOfTheBuilding;
 
-    [Header("Cost Settings")]
     public List<ResourceCost> cost = new List<ResourceCost>();
 
-    [Header("Building Size")]
     public int sizeX = 1;
     public int sizeY = 1;
 
-    [Header("Electricity Settings")]
     [SerializeField] protected bool needElectricity = false;
-    [SerializeField] protected int electricityCost = 0;   // consommation du bâtiment
-    protected bool hasPower = false;                      // état actuel du bâtiment
+    [SerializeField] protected int electricityCost = 0;
 
+    protected bool hasPower = false;
+    protected BuildingManager buildingManager;
     protected GridManager gridManager;
+
     private int currentRotationIndex = 0;
     public bool isPlaced { get; private set; } = false;
+
+    private Coroutine electricityRoutine;
 
     private void OnValidate()
     {
@@ -40,68 +41,48 @@ public class Building : MonoBehaviour
 
     public virtual void Start()
     {
-        gridManager = GetComponentInParent<GridManager>();
+        if (!isPlaced) return;
+        
+        buildingManager = GetComponentInParent<BuildingManager>();
+        gridManager = buildingManager.gridManager;
 
-        // Si le bâtiment consomme de l'électricité → boucle d'alimentation
         if (needElectricity)
-            StartCoroutine(CheckElectricityRoutine());
+            electricityRoutine = StartCoroutine(ElectricityCheck());
+        else
+            hasPower = true;
     }
 
-    private IEnumerator CheckElectricityRoutine()
+    private IEnumerator ElectricityCheck()
     {
         while (true)
         {
             if (gridManager != null && needElectricity)
             {
                 Cell cell = gridManager.GetCellAtPosition(transform.position);
-                bool poweredByGrid = (cell != null && cell.haveElectricity);
+                bool powered = cell != null && cell.haveElectricity;
 
-                if (poweredByGrid != hasPower)
+                if (powered && !hasPower)
                 {
-                    hasPower = poweredByGrid;
-
-                    if (hasPower)
+                    if (ElectricityManager.Instance.TryConsumeElectricity(electricityCost))
                     {
-                        // Vérifie si on peut consommer l’électricité
-                        if (ElectricityManager.Instance.TryConsumeElectricity(electricityCost))
-                        {
-                            OnPowered();
-                        }
-                        else
-                        {
-                            // Pas assez d'électricité globale
-                            hasPower = false;
-                            OnNoPower();
-                        }
-                    }
-                    else
-                    {
-                        // Le bâtiment n’est plus alimenté par le réseau
-                        ElectricityManager.Instance.ReleaseElectricity(electricityCost);
-                        OnNoPower();
+                        hasPower = true;
+                        OnPowered();
                     }
                 }
-            }
-            else if (gridManager != null && !needElectricity)
-            {
-                hasPower = true;
+                else if (!powered && hasPower)
+                {
+                    hasPower = false;
+                    ElectricityManager.Instance.ReleaseElectricity(electricityCost);
+                    OnNoPower();
+                }
             }
 
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.3f);
         }
     }
 
-    // Appelé quand le bâtiment s’allume
-    protected virtual void OnPowered()
-    {
-        Debug.Log($"{name} est alimenté !");
-    }
-
-    // Appelé quand il s’éteint
-    protected virtual void OnNoPower()
-    {
-        Debug.Log($"{name} n'a plus d'électricité !");
-    }
+    protected virtual void OnPowered() { }
+    protected virtual void OnNoPower() { }
 
     public void Place()
     {
@@ -111,7 +92,6 @@ public class Building : MonoBehaviour
     public void RotateToNext()
     {
         if (rotation.Count == 0) return;
-
         currentRotationIndex = (currentRotationIndex + 1) % rotation.Count;
         transform.rotation = Quaternion.Euler(rotation[currentRotationIndex]);
     }
@@ -133,18 +113,16 @@ public class Building : MonoBehaviour
     public bool ConsumeResources()
     {
         if (!CanAfford()) return false;
-
         foreach (var res in cost)
             ResourceManager.TryConsume(res.resourceName, res.amount);
-
         return true;
     }
 
     public virtual void DestroyTheBuilding()
     {
-        StopAllCoroutines();
+        if (electricityRoutine != null)
+            StopCoroutine(electricityRoutine);
 
-        // Si le bâtiment consommait et était alimenté → libérer l’électricité
         if (hasPower && needElectricity && electricityCost > 0)
             ElectricityManager.Instance.ReleaseElectricity(electricityCost);
 

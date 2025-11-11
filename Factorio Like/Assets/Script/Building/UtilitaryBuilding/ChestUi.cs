@@ -1,25 +1,24 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ChestUi : MonoBehaviour
 {
-    public List<Image> atomSprites = new List<Image>();
-    public List<TextMeshProUGUI> atomTexts = new List<TextMeshProUGUI>();
-    
+    [SerializeField] private List<Image> atomSprites = new List<Image>();
+    [SerializeField] private List<TextMeshProUGUI> atomTexts = new List<TextMeshProUGUI>();
+
     private Chest chest;
 
     private void Start()
     {
         chest = GetComponent<Chest>();
     }
-    
+
     private void OnEnable()
     {
-        StartCoroutine(CheckAtomsLoop());
+        StartCoroutine(UpdateUIRoutine());
     }
 
     private void OnDisable()
@@ -27,43 +26,37 @@ public class ChestUi : MonoBehaviour
         StopAllCoroutines();
     }
 
-    private IEnumerator CheckAtomsLoop()
+    private IEnumerator UpdateUIRoutine()
     {
         while (gameObject.activeInHierarchy)
         {
-            CheckIfAtomInChest();
+            UpdateChestUI();
             yield return new WaitForSecondsRealtime(0.2f);
         }
     }
 
-    private void CheckIfAtomInChest()
+    private void UpdateChestUI()
     {
-        if (chest == null)
-            return;
+        if (chest == null) return;
 
         var items = chest.GetItems();
 
-        // Réinitialiser
         for (int i = 0; i < atomSprites.Count; i++)
         {
             atomSprites[i].gameObject.SetActive(false);
             atomTexts[i].gameObject.SetActive(false);
         }
 
-        // Afficher les atomes présents
         for (int i = 0; i < items.Count && i < atomSprites.Count; i++)
         {
-            string atomName = items[i].Item1;
-            int atomQuantity = items[i].Item2;
+            string name = items[i].Item1;
+            int quantity = items[i].Item2;
 
             atomTexts[i].gameObject.SetActive(true);
-            atomTexts[i].text = $"x{atomQuantity}";
+            atomTexts[i].text = $"x{quantity}";
 
             atomSprites[i].gameObject.SetActive(true);
-            atomSprites[i].color = chest.GetItemColor(atomName);
+            atomSprites[i].color = chest.GetItemColor(name);
         }
-
     }
-
-
 }

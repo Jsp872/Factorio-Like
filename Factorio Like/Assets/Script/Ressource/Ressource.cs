@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public enum RessourceType
@@ -15,4 +14,3 @@ public class Ressource : MonoBehaviour
     public RessourceType type;
     public bool isGrabbed;
 }
-

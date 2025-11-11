@@ -11,7 +11,7 @@ public class InventoryUI : MonoBehaviour
         public TextMeshProUGUI text;
     }
 
-    [Header("Références UI")]
+    [Header("UI References")]
     public List<ResourceUI> resourceUIList;
 
     private static Dictionary<string, TextMeshProUGUI> uiDict;
@@ -35,17 +35,12 @@ public class InventoryUI : MonoBehaviour
     public static void UpdateUI(string name, int amount)
     {
         if (uiDict != null && uiDict.TryGetValue(name.ToLower(), out var text))
-        {
             text.text = amount.ToString();
-        }
     }
-    
+
     public static void RefreshAll()
     {
         foreach (var res in ResourceManager.GetAllResources())
-        {
             UpdateUI(res.Key, res.Value);
-        }
     }
-
 }

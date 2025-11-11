@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class GridDrawer : MonoBehaviour
@@ -15,19 +15,23 @@ public class GridDrawer : MonoBehaviour
     public float viewRadius = 5f;
 
     [Header("Performance Settings")]
-    public float updateInterval = 0.1f;     // Délai entre deux updates
-    public float movementThreshold = 0.2f;  // Distance min pour recalculer
+    public float updateInterval = 0.1f;
+    public float movementThreshold = 0.2f;
 
     private Vector3 lastPlayerPos;
     private Mesh mesh;
 
-    void Start()
+    private readonly List<Vector3> vertices = new();
+    private readonly List<int> indices = new();
+    private readonly List<Color> colors = new();
+
+    private void Start()
     {
         lastPlayerPos = player != null ? player.position : Vector3.zero;
         StartCoroutine(AutoUpdate());
     }
 
-    IEnumerator AutoUpdate()
+    private IEnumerator AutoUpdate()
     {
         while (true)
         {
@@ -42,59 +46,40 @@ public class GridDrawer : MonoBehaviour
 
     public void DrawAtoms()
     {
-        if (gridManager == null || gridManager.cells == null || player == null)
-            return;
+        if (gridManager == null || gridManager.cells == null || player == null) return;
 
-        if (mesh != null)
-            mesh.Clear();
-        else
-            mesh = new Mesh();
+        if (mesh == null) mesh = new Mesh();
+        else mesh.Clear();
 
-        var vertices = new List<Vector3>();
-        var indices = new List<int>();
-        var colors = new List<Color>();
+        vertices.Clear();
+        indices.Clear();
+        colors.Clear();
 
         int index = 0;
         Vector3 playerPos = player.position;
 
         foreach (var cell in gridManager.cells)
         {
-            if (Vector3.Distance(playerPos, cell.Position) > viewRadius)
-                continue;
+            if (Vector3.Distance(playerPos, cell.Position) > viewRadius) continue;
 
             float half = squareSize / 2f;
 
-            // ---- ATOME ----
+            // Atom
             if (cell.haveAtom)
             {
                 Color atomColor = Color.gray;
-                if (cell.atoms != null)
+                foreach (var atom in cell.atoms)
                 {
-                    foreach (var atom in cell.atoms)
-                    {
-                        if (atom.active)
-                        {
-                            atomColor = atom.color;
-                            break;
-                        }
-                    }
+                    if (atom.active) { atomColor = atom.color; break; }
                 }
-                DrawSquare(cell.Position, half, atomColor, ref index, vertices, indices, colors);
+                DrawSquare(cell.Position, half, atomColor, ref index);
             }
 
-            // ---- ÉLECTRICITÉ ----
-            {
-                float electricityHalf = half + 0.1f;
-                Color electricityColor = cell.haveElectricity ? Color.blue : Color.gray;
-                DrawSquare(cell.Position, electricityHalf, electricityColor, ref index, vertices, indices, colors);
-            }
+            // Electricity
+            DrawSquare(cell.Position, half + 0.1f, cell.haveElectricity ? Color.blue : Color.gray, ref index);
 
-            // ---- PURIFICATION ----
-            {
-                float purifyHalf = half + 0.3f;
-                Color purifyColor = cell.isPurify ? Color.green : Color.red;
-                DrawSquare(cell.Position, purifyHalf, purifyColor, ref index, vertices, indices, colors);
-            }
+            // Purification
+            DrawSquare(cell.Position, half + 0.3f, cell.isPurify ? Color.green : Color.red, ref index);
         }
 
         mesh.SetVertices(vertices);
@@ -103,13 +88,11 @@ public class GridDrawer : MonoBehaviour
 
         var mf = GetComponent<MeshFilter>();
         var mr = GetComponent<MeshRenderer>();
-
         mf.mesh = mesh;
         mr.material = lineMaterial;
     }
 
-    private void DrawSquare(Vector2 center, float halfSize, Color color, ref int index,
-                            List<Vector3> vertices, List<int> indices, List<Color> colors)
+    private void DrawSquare(Vector2 center, float halfSize, Color color, ref int index)
     {
         Vector3 tl = transform.InverseTransformPoint(new Vector3(center.x - halfSize, center.y + halfSize, 0f));
         Vector3 tr = transform.InverseTransformPoint(new Vector3(center.x + halfSize, center.y + halfSize, 0f));
@@ -118,17 +101,13 @@ public class GridDrawer : MonoBehaviour
 
         vertices.Add(tl); indices.Add(index++);
         vertices.Add(tr); indices.Add(index++);
-
         vertices.Add(tr); indices.Add(index++);
         vertices.Add(br); indices.Add(index++);
-
         vertices.Add(br); indices.Add(index++);
         vertices.Add(bl); indices.Add(index++);
-
         vertices.Add(bl); indices.Add(index++);
         vertices.Add(tl); indices.Add(index++);
 
-        for (int i = 0; i < 8; i++)
-            colors.Add(color);
+        for (int i = 0; i < 8; i++) colors.Add(color);
     }
 }

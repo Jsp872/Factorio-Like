@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2052199210220275098}
-  - component: {fileID: 3343810598852090101}
   - component: {fileID: 9035199193302233826}
+  - component: {fileID: -3776349443903966668}
   m_Layer: 0
   m_Name: panneux solaire
   m_TagString: Untagged
@@ -38,29 +38,6 @@ Transform:
   - {fileID: 7523217927094099764}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!114 &3343810598852090101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1518165499728456276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f29fd71bcdd4b3469e3b795f538b211, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ElectricalRelay
-  Health: 0
-  rotation: []
-  cantBeDestroyed: 0
-  panelOfTheBuilding: {fileID: 0}
-  cost: []
-  sizeX: 1
-  sizeY: 1
-  needElectricity: 0
-  electricityCost: 0
-  radiusOfElectricity: 3
-  electricityAmountProduct: 50
 --- !u!61 &9035199193302233826
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -107,6 +84,31 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5912155, y: 2.234491}
   m_EdgeRadius: 0
+--- !u!114 &-3776349443903966668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518165499728456276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0959c90deda2fa24985b8cdbc6da99bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SolarPanel
+  Health: 15
+  rotation: []
+  cantBeDestroyed: 0
+  panelOfTheBuilding: {fileID: 0}
+  cost:
+  - resourceName: fe
+    amount: 5
+  sizeX: 1
+  sizeY: 1
+  needElectricity: 0
+  electricityCost: 0
+  radiusOfElectricity: 3
+  electricityAmountProduct: 50
 --- !u!1 &1586518665015365876
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class PurifyWarning : MonoBehaviour
 {
-    public GridManager gridManager;
-    public Transform player;
-    public float warningTime = 5f;
-    
+    [SerializeField] private GridManager gridManager;
+    [SerializeField] private Transform player;
+    [SerializeField] private float warningTime = 5f;
     [SerializeField] private TextMeshProUGUI warningText;
     [SerializeField] private Vector2 spawnPosition;
 
@@ -16,7 +15,7 @@ public class PurifyWarning : MonoBehaviour
 
     private void Start()
     {
-        player = gameObject.transform;
+        player = transform;
         if (warningText != null) warningText.gameObject.SetActive(false);
         StartCoroutine(CheckCellRoutine());
     }
@@ -35,7 +34,6 @@ public class PurifyWarning : MonoBehaviour
 
             if (currentCell != lastCell)
             {
-                // Le joueur est entré dans une nouvelle cellule
                 if (!currentCell.isPurify)
                 {
                     if (warningCoroutine == null)
@@ -65,14 +63,12 @@ public class PurifyWarning : MonoBehaviour
 
         while (timer > 0)
         {
-            // Met à jour le texte avec le temps restant
             if (warningText != null)
                 warningText.text = $"Zone non purifiée ! Temps restant pour revenir à une zone purifiée : {timer:F1}s";
 
             timer -= 0.1f;
             yield return new WaitForSeconds(0.1f);
 
-            // Vérifie si le joueur est revenu dans une zone purifiée
             Cell currentCell = gridManager.GetCellAtPosition(player.position);
             if (currentCell != null && currentCell.isPurify)
             {
@@ -88,6 +84,6 @@ public class PurifyWarning : MonoBehaviour
     private void OnTimeUp()
     {
         if (warningText != null) warningText.gameObject.SetActive(false);
-        gameObject.transform.position = spawnPosition;
+        transform.position = spawnPosition;
     }
 }

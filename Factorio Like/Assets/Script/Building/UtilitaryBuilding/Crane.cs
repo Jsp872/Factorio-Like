@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class Crane : UtilityBuildings
 {
-    [Header("Crane Settings")]
     [SerializeField] private GameObject grabZone;
     [SerializeField] private Vector2 grabZonePosition;
-    [SerializeField] private Vector3 grabZoneSize = new Vector3(1f, 1f, 1f);
+    [SerializeField] private Vector3 grabZoneSize = new Vector3(1f,1f,1f);
     [SerializeField] private float duration = 1f;
     [SerializeField] private float moveDistance = 1f;
     [SerializeField] private LayerMask atomLayer;
@@ -23,10 +22,6 @@ public class Crane : UtilityBuildings
     {
         base.Start();
         grabZone.transform.localPosition = grabZonePosition;
-    }
-
-    private void OnEnable()
-    {
         StartCoroutine(CheckAtomsLoop());
     }
 
@@ -36,14 +31,13 @@ public class Crane : UtilityBuildings
         {
             if (isPlaced && !isGrabbing)
             {
-                if (TryGrabFromChest())
-                {
+                if (TryGrabFromChest()) 
+                { 
                     yield return new WaitForSecondsRealtime(0.2f);
-                    continue;
+                    continue; 
                 }
-                
-                DetectAtomsInZone();
 
+                DetectAtomsInZone();
                 if (grabbedObjects.Count > 0)
                     GrabAtom(grabbedObjects[0]);
             }
@@ -51,22 +45,15 @@ public class Crane : UtilityBuildings
             yield return new WaitForSecondsRealtime(0.2f);
         }
     }
-    
+
     private bool TryGrabFromChest()
     {
-        Collider[] chests = Physics.OverlapBox(
-            grabZone.transform.position,
-            grabZoneSize / 2f,
-            grabZone.transform.rotation,
-            chestLayer
-        );
-
+        Collider[] chests = Physics.OverlapBox(grabZone.transform.position, grabZoneSize / 2f, grabZone.transform.rotation, chestLayer);
         foreach (Collider chestCol in chests)
         {
             if (chestCol.TryGetComponent(out Chest chest))
             {
                 GameObject item = chest.GetAnyItem();
-
                 if (item != null)
                 {
                     GrabAtom(item);
@@ -74,40 +61,26 @@ public class Crane : UtilityBuildings
                 }
             }
         }
-
         return false;
     }
 
     private void DetectAtomsInZone()
     {
         grabbedObjects.Clear();
-
-        int hitCount = Physics.OverlapBoxNonAlloc(
-            grabZone.transform.position,
-            grabZoneSize / 2f,
-            hitsBuffer,
-            grabZone.transform.rotation,
-            atomLayer
-        );
-
+        int hitCount = Physics.OverlapBoxNonAlloc(grabZone.transform.position, grabZoneSize / 2f, hitsBuffer, grabZone.transform.rotation, atomLayer);
         for (int i = 0; i < hitCount; i++)
         {
-            Collider hit = hitsBuffer[i];
-            if (hit.TryGetComponent(out Ressource atom) && !atom.isGrabbed)
-                grabbedObjects.Add(hit.gameObject);
+            if (hitsBuffer[i].TryGetComponent(out Ressource atom) && !atom.isGrabbed)
+                grabbedObjects.Add(hitsBuffer[i].gameObject);
         }
     }
 
     private void GrabAtom(GameObject atom)
     {
-        Ressource ressourceComponent = atom.GetComponent<Ressource>();
-        if (ressourceComponent == null || ressourceComponent.isGrabbed) return;
+        if (!atom.TryGetComponent(out Ressource res) || res.isGrabbed) return;
+        if (selectedResourceType != null && res.type != selectedResourceType) return;
 
-        // 💡 Vérifie si c’est bien le bon type d’atome
-        if (selectedResourceType != null && ressourceComponent.type != selectedResourceType)
-            return; // pas le bon type, on ignore
-
-        ressourceComponent.isGrabbed = true;
+        res.isGrabbed = true;
         isGrabbing = true;
 
         atom.transform.SetParent(grabZone.transform);
@@ -120,13 +93,13 @@ public class Crane : UtilityBuildings
             rb.angularVelocity = Vector3.zero;
         }
 
-        if (atom.TryGetComponent(out BoxCollider box))
-            box.enabled = false;
+        if (atom.TryGetComponent(out Collider col))
+            col.enabled = false;
 
-        StartCoroutine(MoveAtom(atom, ressourceComponent));
+        StartCoroutine(MoveAtom(atom, res));
     }
 
-    private IEnumerator MoveAtom(GameObject atom, Ressource ressourceData)
+    private IEnumerator MoveAtom(GameObject atom, Ressource res)
     {
         Vector3 startPos = grabZone.transform.localPosition;
         Vector3 endPos = startPos + Vector3.right * moveDistance;
@@ -135,22 +108,19 @@ public class Crane : UtilityBuildings
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            grabZone.transform.localPosition = Vector3.Lerp(startPos, endPos, t);
+            grabZone.transform.localPosition = Vector3.Lerp(startPos, endPos, Mathf.Clamp01(elapsed / duration));
             yield return null;
         }
 
-        ReleaseAtom(atom, startPos, ressourceData);
+        ReleaseAtom(atom, startPos, res);
     }
 
-    private void ReleaseAtom(GameObject atom, Vector3 startPos, Ressource ressourceData)
+    private void ReleaseAtom(GameObject atom, Vector3 startPos, Ressource res)
     {
-        if (atom.TryGetComponent(out BoxCollider box))
-            box.enabled = true;
+        if (atom.TryGetComponent(out Collider col))
+            col.enabled = true;
 
-        if (ressourceData != null)
-            ressourceData.isGrabbed = false;
-
+        res.isGrabbed = false;
         atom.transform.SetParent(null);
         grabZone.transform.localPosition = startPos;
         isGrabbing = false;
@@ -159,6 +129,7 @@ public class Crane : UtilityBuildings
 
     private void OnDrawGizmosSelected()
     {
+        if (grabZone == null) return;
         Gizmos.color = Color.yellow;
         Gizmos.matrix = grabZone.transform.localToWorldMatrix;
         Gizmos.DrawWireCube(Vector3.zero, grabZoneSize);

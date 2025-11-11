@@ -142,7 +142,9 @@ MonoBehaviour:
   rotation: []
   cantBeDestroyed: 0
   panelOfTheBuilding: {fileID: 0}
-  cost: []
+  cost:
+  - resourceName: fe
+    amount: 2
   sizeX: 1
   sizeY: 1
   needElectricity: 1

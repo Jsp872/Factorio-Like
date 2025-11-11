@@ -1,10 +1,10 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UiInGame : MonoBehaviour
 {
-    [SerializeField] private GridManager gridManager;
+    [SerializeField] private BuildingManager buildingManager;
     [SerializeField] private GameObject BuildingPanel;
-    
     [SerializeField] private GameObject ExtractorBuildingButton;
     [SerializeField] private GameObject PurifyBuildingButton;
     [SerializeField] private GameObject ElectricityBuildingButton;
@@ -12,12 +12,11 @@ public class UiInGame : MonoBehaviour
 
     public void SetBuildingPanel()
     {
-        if (!gridManager.buildingMode)
+        if (!buildingManager.buildingMode)
         {
             BuildingPanel.SetActive(true);
-            gridManager.buildingMode = true;
+            buildingManager.buildingMode = true;
         }
-
         else
         {
             ExtractorBuildingButton.SetActive(false);
@@ -25,8 +24,8 @@ public class UiInGame : MonoBehaviour
             ElectricityBuildingButton.SetActive(false);
             UtilitaryBuildingButton.SetActive(false);
             BuildingPanel.SetActive(false);
-            gridManager.buildingMode = false;
-            Destroy(gridManager.currentPreview);
+            buildingManager.buildingMode = false;
+            Destroy(buildingManager.currentPreview);
         }
     }
 
@@ -60,5 +59,10 @@ public class UiInGame : MonoBehaviour
         PurifyBuildingButton.SetActive(false);
         ElectricityBuildingButton.SetActive(false);
         ExtractorBuildingButton.SetActive(false);
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

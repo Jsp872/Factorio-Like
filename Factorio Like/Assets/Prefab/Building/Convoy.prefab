@@ -54,11 +54,14 @@ MonoBehaviour:
   - {x: 90, y: 180, z: 0}
   - {x: 0, y: -90, z: 90}
   cantBeDestroyed: 0
+  panelOfTheBuilding: {fileID: 0}
   cost:
   - resourceName: fe
-    amount: 0
+    amount: 1
   sizeX: 1
   sizeY: 1
+  needElectricity: 1
+  electricityCost: 5
   directionToMove: {x: 0, y: 0}
   moveSpeed: 1
 --- !u!65 &-7482987344700501689

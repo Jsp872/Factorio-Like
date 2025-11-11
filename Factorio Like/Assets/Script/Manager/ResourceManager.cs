@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class ResourceManager : MonoBehaviour
 {
@@ -15,7 +14,6 @@ public class ResourceManager : MonoBehaviour
 
     [Header("Liste des ressources du jeu")]
     public List<ResourceData> resources = new List<ResourceData>();
-
     private Dictionary<string, ResourceData> resourceDict;
 
     private void Awake()
@@ -35,24 +33,15 @@ public class ResourceManager : MonoBehaviour
     public static void Add(string name, int amount)
     {
         if (Instance.resourceDict.TryGetValue(name.ToLower(), out var res))
-        {
             res.amount += amount;
-        }
-        else
-        {
-            Debug.LogWarning($"Resource '{name}' not found.");
-        }
     }
 
     public static bool TryConsume(string name, int amount)
     {
-        if (Instance.resourceDict.TryGetValue(name.ToLower(), out var res))
+        if (Instance.resourceDict.TryGetValue(name.ToLower(), out var res) && res.amount >= amount)
         {
-            if (res.amount >= amount)
-            {
-                res.amount -= amount;
-                return true;
-            }
+            res.amount -= amount;
+            return true;
         }
         return false;
     }
@@ -61,17 +50,12 @@ public class ResourceManager : MonoBehaviour
     {
         return Instance.resourceDict.TryGetValue(name.ToLower(), out var res) ? res.amount : 0;
     }
-    
+
     public static Dictionary<string, int> GetAllResources()
     {
-        Dictionary<string, int> result = new Dictionary<string, int>();
-
+        var result = new Dictionary<string, int>();
         foreach (var kvp in Instance.resourceDict)
-        {
             result[kvp.Key] = kvp.Value.amount;
-        }
-
         return result;
     }
-
 }

@@ -1,15 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Chest : UtilityBuildings
 {
-    [Header("Chest Settings")]
     [SerializeField] private LayerMask atomLayer;
     [SerializeField] private Vector3 grabZoneSize = new Vector3(0.5f, 0.5f, 0.5f);
-    [FormerlySerializedAs("atomData")] [SerializeField] private RessourceList _ressourceData;
-
+    [SerializeField] private RessourceList _ressourceData;
 
     private readonly Collider[] hitsBuffer = new Collider[20];
     private Dictionary<string, int> items = new Dictionary<string, int>();
@@ -25,8 +22,7 @@ public class Chest : UtilityBuildings
         {
             foreach (var atom in _ressourceData.ressources)
             {
-                if (atom.prefab == null)
-                    continue;
+                if (atom.prefab == null) continue;
 
                 itemPrefabs[atom.name] = atom.prefab;
                 itemColors[atom.name] = atom.color;
@@ -38,8 +34,6 @@ public class Chest : UtilityBuildings
     {
         return itemColors.ContainsKey(itemName) ? itemColors[itemName] : Color.white;
     }
-
-
 
     private void OnEnable()
     {
@@ -64,13 +58,7 @@ public class Chest : UtilityBuildings
 
     private void DetectAtomsInZone()
     {
-        int hitCount = Physics.OverlapBoxNonAlloc(
-            transform.position,
-            grabZoneSize / 2f,
-            hitsBuffer,
-            transform.rotation,
-            atomLayer
-        );
+        int hitCount = Physics.OverlapBoxNonAlloc(transform.position, grabZoneSize / 2f, hitsBuffer, transform.rotation, atomLayer);
 
         for (int i = 0; i < hitCount; i++)
         {
@@ -82,13 +70,8 @@ public class Chest : UtilityBuildings
                 Destroy(hit.gameObject);
             }
         }
-        
-        foreach (var (objName, qty) in GetItems())
-        {
-            Debug.Log($"{objName} x{qty}");
-        }
     }
-    
+
     public virtual void AddItem(string itemName, int quantity)
     {
         if (items.ContainsKey(itemName))
@@ -101,23 +84,15 @@ public class Chest : UtilityBuildings
     {
         foreach (var itemName in new List<string>(items.Keys))
         {
-            if (items[itemName] > 0)
+            if (items[itemName] > 0 && RemoveItem(itemName, 1))
             {
-                // 🔹 Utilise RemoveItem() plutôt que décrémenter directement
-                if (RemoveItem(itemName, 1))
-                {
-                    if (itemPrefabs.TryGetValue(itemName, out GameObject prefab))
-                    {
-                        return Instantiate(prefab, transform.position, Quaternion.identity);
-                    }
-                }
+                if (itemPrefabs.TryGetValue(itemName, out GameObject prefab))
+                    return Instantiate(prefab, transform.position, Quaternion.identity);
             }
         }
-
         return null;
     }
 
-    
     public virtual bool RemoveItem(string itemName, int quantity)
     {
         if (items.ContainsKey(itemName) && items[itemName] >= quantity)
@@ -129,7 +104,7 @@ public class Chest : UtilityBuildings
         }
         return false;
     }
-    
+
     public List<(string, int)> GetItems()
     {
         List<(string, int)> list = new List<(string, int)>();
@@ -137,7 +112,7 @@ public class Chest : UtilityBuildings
             list.Add((kvp.Key, kvp.Value));
         return list;
     }
-    
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
@@ -149,18 +124,13 @@ public class Chest : UtilityBuildings
     {
         foreach (var kvp in items)
         {
-            int quantity = kvp.Value; 
+            int quantity = kvp.Value;
             for (int i = 0; i < quantity; i++)
             {
-                Vector3 dropPos = transform.position + new Vector3(
-                    Random.Range(-0.3f, 0.3f), 
-                    Random.Range(-0.3f, 0.3f)
-                    ); 
+                Vector3 dropPos = transform.position + new Vector3(Random.Range(-0.3f, 0.3f), Random.Range(-0.3f, 0.3f));
                 Instantiate(itemPrefabs[kvp.Key], dropPos, Quaternion.identity);
             }
         }
-
         base.DestroyTheBuilding();
     }
-
 }

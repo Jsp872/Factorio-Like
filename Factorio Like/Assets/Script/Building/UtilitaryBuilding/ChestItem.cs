@@ -12,4 +12,3 @@ public class ChestItem
         this.quantity = quantity;
     }
 }
-

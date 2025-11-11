@@ -15,5 +15,6 @@ public class RessourceList : ScriptableObject
         public Material material;
     }
 
-    [FormerlySerializedAs("atoms")] public List<Ressource> ressources = new List<Ressource>();
+    [FormerlySerializedAs("atoms")] 
+    public List<Ressource> ressources = new List<Ressource>();
 }

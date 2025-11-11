@@ -305,15 +305,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30220d21c4120e44f81ddade9cb5fab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PurifyingBuilding
-  Health: 5
+  Health: 10
   rotation: []
   cantBeDestroyed: 0
   panelOfTheBuilding: {fileID: 0}
-  cost: []
+  cost:
+  - resourceName: fe
+    amount: 6
+  - resourceName: h
+    amount: 5
   sizeX: 1
   sizeY: 1
+  needElectricity: 0
+  electricityCost: 20
   radiusOfPurifying: 2
-  updateInterval: 0.5
 --- !u!1 &4051808843479002851
 GameObject:
   m_ObjectHideFlags: 0

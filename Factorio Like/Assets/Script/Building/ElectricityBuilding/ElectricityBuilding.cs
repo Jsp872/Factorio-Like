@@ -2,98 +2,78 @@ using UnityEngine;
 
 public class ElectricityBuilding : Building
 {
-    [SerializeField] protected int radiusOfElectricity = 2; 
+    [SerializeField] protected int radiusOfElectricity = 2;
     [SerializeField] protected int electricityAmountProduct = 5;
 
-    private bool isActive = false; // true si le champ électrique est actif
+    private bool fieldActive = false;
 
     public override void Start()
     {
         base.Start();
-        TryActivateElectricityField();
+        TryActivateField();
     }
 
-    private void TryActivateElectricityField()
+    private void TryActivateField()
     {
         if (!isPlaced) return;
-        // Si le bâtiment a besoin d'électricité et n'est pas alimenté → ne pas activer
-        if (needElectricity && !hasPower) 
-        {
-            Debug.Log($"{name} n'a pas assez de réseau pour s'activer !");
-            return;
-        }
 
-        ActivateElectricityField();
+        if (needElectricity && !hasPower)
+            return;
+
+        ActivateField();
     }
 
     protected override void OnPowered()
     {
         base.OnPowered();
-
-        // Si le bâtiment consomme du réseau et n'était pas actif, on active le champ
-        if (!isActive)
-        {
-            ActivateElectricityField();
-        }
+        if (!fieldActive)
+            ActivateField();
     }
 
     protected override void OnNoPower()
     {
         base.OnNoPower();
-
-        // Désactive le champ électrique si plus d'électricité disponible
-        if (isActive)
-        {
-            DeactivateElectricityField();
-        }
+        if (fieldActive)
+            DeactivateField();
     }
 
-    private void ActivateElectricityField()
+    private void ActivateField()
     {
-        if (isActive) return;
-        isActive = true;
+        if (fieldActive) return;
 
+        fieldActive = true;
         ElectricityManager.Instance.RegisterProducer(electricityAmountProduct);
 
-        if (gridManager == null || gridManager.cells == null) return;
+        if (gridManager == null) return;
         Vector3 center = transform.position;
 
         foreach (var cell in gridManager.cells)
         {
-            float distance = Vector2.Distance(
-                new Vector2(center.x, center.y),
-                new Vector2(cell.Position.x, cell.Position.y)
-            );
-
-            if (distance <= radiusOfElectricity * gridManager.cellSize)
+            float dist = Vector2.Distance(center, cell.Position);
+            if (dist <= radiusOfElectricity * gridManager.cellSize)
             {
-                cell.electricitySources++;  // incrémente le compteur
-                cell.haveElectricity = true; // active visuellement
+                cell.electricitySources++;
+                cell.haveElectricity = true;
             }
         }
     }
 
-    private void DeactivateElectricityField()
+    private void DeactivateField()
     {
-        if (!isActive) return;
-        isActive = false;
+        if (!fieldActive) return;
 
+        fieldActive = false;
         ElectricityManager.Instance.UnregisterProducer(electricityAmountProduct);
-        Debug.Log("a");
-        if (gridManager == null || gridManager.cells == null) return;
+
+        if (gridManager == null) return;
         Vector3 center = transform.position;
 
-        
         foreach (var cell in gridManager.cells)
         {
-            float distance = Vector2.Distance(
-                new Vector2(center.x, center.y),
-                new Vector2(cell.Position.x, cell.Position.y)
-            );
-
-            if (distance <= radiusOfElectricity * gridManager.cellSize)
+            float dist = Vector2.Distance(center, cell.Position);
+            if (dist <= radiusOfElectricity * gridManager.cellSize)
             {
-                cell.electricitySources--;  // décrémente le compteur
+                cell.electricitySources--;
                 if (cell.electricitySources <= 0)
                 {
                     cell.electricitySources = 0;
@@ -103,10 +83,9 @@ public class ElectricityBuilding : Building
         }
     }
 
-
     public override void DestroyTheBuilding()
     {
-        DeactivateElectricityField();
+        DeactivateField();
         base.DestroyTheBuilding();
     }
 }

@@ -309,6 +309,7 @@ MonoBehaviour:
   Health: 1
   rotation: []
   cantBeDestroyed: 0
+  panelOfTheBuilding: {fileID: 0}
   cost:
   - resourceName: fe
     amount: 5
@@ -316,6 +317,8 @@ MonoBehaviour:
     amount: 5
   sizeX: 1
   sizeY: 1
+  needElectricity: 1
+  electricityCost: 20
   atomLayer:
     serializedVersion: 2
     m_Bits: 64

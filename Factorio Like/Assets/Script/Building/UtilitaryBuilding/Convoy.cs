@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Convoy : UtilityBuildings
@@ -9,13 +8,12 @@ public class Convoy : UtilityBuildings
     public override void Start()
     {
         base.Start();
-        CheckDirection();
+        SetDirection();
     }
 
-    private void CheckDirection()
+    private void SetDirection()
     {
         float angleY = transform.eulerAngles.y;
-
         directionToMove = angleY switch
         {
             0 => Vector2.right,
@@ -26,24 +24,17 @@ public class Convoy : UtilityBuildings
         };
     }
 
-
     private void OnTriggerStay(Collider other)
     {
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb != null)
-        {
             rb.linearVelocity = directionToMove * moveSpeed;
-        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
             rb.linearVelocity = directionToMove * 0.1f;
-        }
     }
-
 }
